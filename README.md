@@ -120,6 +120,10 @@ The recorded walkthrough showed clear field feedback when a space-only name was 
 - Android's launcher briefly stalled during T4. Restarting its process and temporarily disabling animations recovered it; no app data was cleared. Normal animation settings were restored afterward.
 - The Windows build encountered a Kotlin cache problem. Gradle memory/workers were limited, and Kotlin incremental compilation was disabled. The original counter-app widget test was removed as instructed in the guide.
 
+## Package contents and check
+
+`Reddy_Rohan_InClass08.zip` contains one `local_storage_lab` project folder with the app source, Android/iOS configuration, package files, README, and evidence. The three required screenshots and the saved analyzer output are included. Codex extracted the archive into a separate folder and checked the source and configuration; the Dart code matches the tested app, with only Git line-ending normalization. Generated build folders, dependency caches, signing keys, machine-specific configuration, and database files are excluded. A second build from the extracted copy was not run, as the guide does not require it.
+
 ## Before submitting
 
 The final source archive is `Reddy_Rohan_InClass08.zip` and contains one `local_storage_lab` folder. Upload this ZIP to the course's In-Class 08 / Local Storage Part 1 entry, then reopen or download it and check the submission receipt. The posted cutoff is October 6, 2026 at 8:00 pm in the course/iCollege timezone. The guide asks for a personal prediction and walkthrough, so complete your own T1-T6 run and update the evidence and reflections as required. Keep the assistance disclosure consistent with your course rules.
