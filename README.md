@@ -1,109 +1,132 @@
-# Fall Festival Roster — Local Storage Lab, Activity 08
+# In-Class 08 / Fall Festival Roster
 
-## Status and authorship
+- **Student:** Rohan Reddy
+- **Course/section:** CSC MAD (Mobile Application Development)
+- **Pathway:** Undergraduate
+- **Date:** October 6, 2026
+- **Repository:** https://github.com/ReddyR1105/flutter-local-storage-lab
 
-Flutter implementation prepared with OpenAI Codex assistance. Device checks and the evidence below are performed by Codex through the Android emulator; they are not represented as the student's personal observations. Review the code, rerun the required walkthrough yourself, add your name/course/pathway, and disclose assistance according to your course rules before submitting.
+## Assistance
 
-The pasted guide omitted the downloadable database helper, expanded prompts 2–4, assessment rubrics, and submission instructions. `lib/database_helper.dart` recreates the interface and exact version-1 schema described in the guide. Compare it with the instructor's helper and check the complete LMS submission requirements.
+I used Codex to help prepare the Flutter app and this write-up. Codex ran the recorded emulator checks, so the screenshots and observations below come from those checks.
 
-## Environment and running
+## About the app
 
-- Windows host; Flutter 3.47.4 stable; Dart 3.13.3.
-- Android application ID: `com.example.local_storage_lab`.
-- Verified target: Pixel_4a emulator (`emulator-5554`), Android 17 / API 37.1, x86_64, 16 KB page image.
-- Generated Dart constraint `^3.13.3` retained because it matches the installed Flutter SDK.
-- Resolved versions: sqflite 2.4.4+1, path_provider 2.1.6, path 1.9.1.
-- Guide dependency constraints retained: `sqflite: ^2.4.1`, `path_provider: ^2.1.5`, `path: ^1.9.0`. Exact resolved versions are in `pubspec.lock`.
-- Android build memory limited to 2 GB/two Gradle workers; Kotlin compilation runs in process with incremental compilation disabled to avoid the Windows compiler cache failure seen during setup.
+The app keeps a small guest list for a Fall Festival. Each guest has a name, an age, and an ID assigned by SQLite. The screen supports Add, Edit, Cancel edit, Delete, and Refresh, and it displays the saved records and their count.
 
-From the project directory:
+## Storage notes
+
+- **Schema and initialization:** `MyDatabase.db` is stored in the app's documents directory. Version 1 creates `my_table`; `main()` initializes one helper and waits for `init()` before the first read. The columns are listed below.
+- **Input policy, IDs, and CRUD:** names are trimmed and must be nonempty; ages must be integers from 0 to 130. SQLite generates the IDs, and update/delete bind the selected ID. CRUD methods are in [database_helper.dart](lib/database_helper.dart); form validation, confirmation, and screen refresh are in [main.dart](lib/main.dart).
+
+| Column | Type | Purpose |
+| --- | --- | --- |
+| `_id` | `INTEGER PRIMARY KEY` | Identifies a guest, even when names match |
+| `name` | `TEXT NOT NULL` | Stores the guest's name |
+| `age` | `INTEGER NOT NULL` | Stores the guest's age |
+
+**Storage examples:** the unsaved text in the form, selected edit ID, and loading flag are memory state. A small theme choice could use key-value preferences; this app does not implement that optional setting. Guest records such as River, ID 2, age 35 belong in SQLite. The first read runs from `initState()`, and successful writes are followed by fresh row/count queries. No guests are seeded at startup.
+
+The form trims the name and rejects an empty result. Ages must be whole numbers from 0 to 130. Edits and deletions use the selected ID, and deletion asks for confirmation showing the ID and name. The app disables controls while an operation is pending and shows loading, empty, error, and affected-row feedback. Failed writes preserve the form input; a completed write followed by a failed refresh has a separate message.
+
+## Setup and running
+
+The recorded checks used Windows, Flutter 3.47.4, Dart 3.13.3, and the Pixel_4a Android emulator (`emulator-5554`, Android 17 / API 37.1). iOS files are included, but iOS was not tested.
+
+The guide's dependency constraints were kept:
+
+```yaml
+sqflite: ^2.4.1
+path_provider: ^2.1.5
+path: ^1.9.0
+```
+
+The resolved versions are sqflite 2.4.4+1, path_provider 2.1.6, and path 1.9.1. `pubspec.lock` is included. The generated Dart constraint, `^3.13.3`, matches the installed SDK.
+
+On the recorded Windows setup, open a terminal in `local_storage_lab`, start the existing emulator, and run:
 
 ```powershell
+flutter emulators --launch Pixel_4a
 flutter pub get
 flutter devices
-flutter run -d <android-device-id>
+flutter run -d emulator-5554
+```
+
+To run the analyzer and save its output:
+
+```powershell
 flutter analyze 2>&1 | Tee-Object -FilePath .\evidence\analysis_output.txt
 ```
 
-Choose Android on Windows. This project uses the lab's mobile `sqflite` setup. iOS source is included but requires macOS/Xcode and has not been verified here.
+## Test results
 
-## Implementation
+The analyzer reported **No issues found**, and the Android debug APK built successfully. The saved outputs are [analysis_output.txt](evidence/analysis_output.txt) and [build_output.txt](evidence/build_output.txt). The table below records the checks performed through the app on the emulator.
 
-`main()` initializes Flutter bindings, creates one `DatabaseHelper`, awaits `init()`, and passes that same instance into `DirectoryApp` and `DirectoryScreen`. An initialization exception produces an explicit error screen and a diagnostic stack trace. The first roster read starts in `initState()`, never `build()`.
+**A = ID 1** and **B = ID 2**. Both guests were named River.
 
-The database is `MyDatabase.db` in the application documents directory. Schema version 1 creates `my_table` with `_id INTEGER PRIMARY KEY`, `name TEXT NOT NULL`, and `age INTEGER NOT NULL`; there are no seeded guests. Insert omits `_id`, query explicitly orders IDs ascending, and update/delete bind the integer ID through `whereArgs`.
-
-The shared Add/Edit form trims names and rejects empty names. It uses `int.tryParse()` to validate integer ages from 0 through 130, inclusive, before writing. Two guests may share a name because identity is the generated `_id`. Cancel edit writes nothing; deletion requires confirmation showing ID/name; canceling deletion writes nothing.
-
-One busy flag disables Add/Save, Edit, Delete, Refresh, Cancel edit, and form editing during pending actions. Successful writes clear the appropriate form and reload both rows and count. One affected row means update/delete success; zero produces an explicit not-found message and a reload. Write failures preserve input; a successful write followed by a failed read reports the completed write and a refresh failure. Refresh retries only reads. Read errors retain and label the last successfully loaded data; only a successful empty read displays "No festival guests yet." Controllers are disposed, and asynchronous state updates check `mounted`.
-
-The generated counter-app widget test was removed as directed by the guide. No replacement automated test suite or migrations were added; T1–T6 are the required verification.
-
-## Verification results
-
-The actual analyzer result is **No issues found** (`evidence/analysis_output.txt`). The Android debug APK built successfully (`evidence/build_output.txt`). All T1-T6 checks below were driven through the visible app with ADB; row snapshots and the T6 input/result log are included in `evidence/`. These are assistant-performed checks.
-
-A = generated ID **1**; B = generated ID **2**. Both names are River.
-
-| Test | Action/input | Expected | Observed rows/count | Result |
+| Test | Action/input | Expected | Observed rows/count | Pass/fail |
 | --- | --- | --- | --- | --- |
-| T1 | Refresh on initial empty installation | Count 0 and successful empty state | No rows; count 0; "No festival guests yet" | PASS |
-| T2 | Add River 21, then River 34 | Two different generated integer IDs; count 2 | A=1 River 21, B=2 River 34; count 2; feedback reported each inserted ID | PASS |
-| T3 | Edit B to 99, Cancel; edit B to 35, Save | Cancel preserves 34; Save affects one row and preserves A | Canceled input was exactly 99; B stayed 34. Saved input was exactly 35; "Updated 1 row"; A=1 River 21, B=2 River 35; count 2 | PASS |
-| T4 | App info -> Force stop -> OK; reopen same installation from launcher icon | Same rows/IDs/ages/count with a new process | Before PID 2682, no PID after Force stop, after PID 8477; A=1 River 21, B=2 River 35; count 2 | PASS |
-| T5 | Cancel Delete A; then confirm Delete A; Refresh | Cancel count 2; delete affects one row; B alone/count 1 | Cancel preserved both; "Deleted ID 1. Deleted 1 row"; after Refresh B=2 River 35 only; count 1 | PASS |
-| T6 | Five rejected attempts, then two accepted boundary inserts (details below) | Invalid inputs preserve B/count 1; boundaries accepted; final count 3 | Actual individual results are recorded below and in `evidence/T6_results.json` | PASS (all seven attempts) |
+| T1 - Empty | Refresh the empty roster | Count 0 and an empty-state message | Count 0; "No festival guests yet" | Pass |
+| T2 - Create | Add River, 21 and River, 34 | Different generated IDs; count 2 | ID 1: River, 21; ID 2: River, 34; count 2 | Pass |
+| T3 - Identity | Change B's age to 99 and Cancel; then change it to 35 and Save | Cancel keeps 34; Save updates one row and leaves A unchanged | Cancel kept ID 2 at 34. Save reported 1 updated row. ID 1 stayed 21; ID 2 became 35; count 2 | Pass |
+| T4 - Restart | Force stop the app and reopen the same installation from its launcher icon | Same IDs, names, ages, and count | ID 1: River, 21; ID 2: River, 35; count 2 before and after | Pass |
+| T5 - Delete | Cancel deletion of A; then confirm it and Refresh | Cancel keeps both rows; confirm deletes one row | Cancel kept count 2. Confirm reported 1 deleted row. Only ID 2: River, 35 remained; count 1 | Pass |
+| T6 - Validation | Try the five invalid inputs and two boundary ages listed below | Invalid inputs write nothing; ages 0 and 130 are accepted | All invalid attempts kept count 1. Acorn and Oak were accepted; final count 3 | Pass |
 
-No hot reload/hot restart, uninstall, Clear storage, app identifier change, or automatic seeding was used for T4. The installed debug APK had no attached Flutter debug session to stop. The launcher briefly stalled; disabling emulator animations and restarting only its launcher process recovered it, after which the lab's launcher icon opened the new process. `evidence/T4_restart_method.txt` records the exact method. iOS was not tested.
+### T6: individual attempts
 
-The initial ADB edit driver appended digits instead of replacing them. The app correctly rejected the resulting out-of-range age; the driver was corrected to clear the field, and T3 was rerun with captured exact inputs 99 and 35. This was an input-driver failure, not a database update failure.
+| Input | Expected | Observed rows/count | Pass/fail |
+| --- | --- | --- | --- |
+| Three spaces as the name; age 21 | Reject the empty trimmed name | "Enter a nonempty name"; River ID 2, age 35 unchanged; count 1 | Pass |
+| Maple; age abc | Reject a nonnumber | "Enter a whole-number age"; River ID 2 unchanged; count 1 | Pass |
+| Maple; age 1.5 | Reject a decimal | "Enter a whole-number age"; River ID 2 unchanged; count 1 | Pass |
+| Maple; age -1 | Reject an age below 0 | "Age must be from 0 through 130"; River ID 2 unchanged; count 1 | Pass |
+| Maple; age 131 | Reject an age above 130 | "Age must be from 0 through 130"; River ID 2 unchanged; count 1 | Pass |
+| Acorn; age 0 | Accept the minimum age | Acorn received ID 3; River ID 2 unchanged; count 2 | Pass |
+| Oak; age 130 | Accept the maximum age | Oak received ID 4; River ID 2 and Acorn ID 3 unchanged; count 3 | Pass |
 
-Required screenshots:
+The final saved rows were River (ID 2, age 35), Acorn (ID 3, age 0), and Oak (ID 4, age 130). The source archive does not contain the emulator's database; a new installation starts empty. The individual T6 observations are also saved in [T6_results.json](evidence/T6_results.json).
 
-- [T4_before.png](evidence/T4_before.png): A=1/21, B=2/35, count 2 before Force stop.
-- [T4_after.png](evidence/T4_after.png): the same stored roster after cold launch.
-- [T6_invalid.png](evidence/T6_invalid.png): space-only name rejected with field feedback, B=2/35 and count 1 unchanged.
+### Restart method and screenshots
 
-| T6 attempt | Name / age input | Expected | Observed rows/count | Result |
-| --- | --- | --- | --- | --- |
-| Whitespace name | Three spaces / 21 | Reject empty trimmed name | "Enter a nonempty name"; ID 2 River 35 unchanged; count 1 | PASS |
-| Nonnumeric age | Maple / abc | Reject noninteger | "Enter a whole-number age"; ID 2 River 35 unchanged; count 1 | PASS |
-| Decimal age | Maple / 1.5 | Reject noninteger | "Enter a whole-number age"; ID 2 River 35 unchanged; count 1 | PASS |
-| Below minimum | Maple / -1 | Reject out of range | "Age must be from 0 through 130"; ID 2 River 35 unchanged; count 1 | PASS |
-| Above maximum | Maple / 131 | Reject out of range | "Age must be from 0 through 130"; ID 2 River 35 unchanged; count 1 | PASS |
-| Minimum boundary | Acorn / 0 | Accept one insert | Generated ID 3, Acorn 0; ID 2 River 35 unchanged; count 2 | PASS |
-| Maximum boundary | Oak / 130 | Accept one insert | Generated ID 4, Oak 130; ID 2 River 35 and ID 3 Acorn 0 unchanged; final count 3 | PASS |
+The prediction was recorded before T4 in [T4_prediction.txt](evidence/T4_prediction.txt). It predicted that IDs 1 and 2, ages 21 and 35, and count 2 would survive because they had been saved to SQLite.
 
-All seven inputs were verified in the form before tapping Add. The emulator currently contains those three final fictional rows; the source project contains no database or seed data, so a new installation begins empty.
+The installed debug APK had no attached Flutter debug session. Android App info was opened, Force stop was selected, and the confirmation was accepted. The app had no running process after that. It was reopened by tapping `local_storage_lab` in the launcher, without clearing storage or uninstalling it. The process ID changed from 2682 to 8477. The exact method is saved in [T4_restart_method.txt](evidence/T4_restart_method.txt).
 
-## Reflection notes to review and personalize
+| Screenshot | What it shows |
+| --- | --- |
+| [T4_before.png](evidence/T4_before.png) | ID 1: River, 21 and ID 2: River, 35; count 2 before stopping |
+| [T4_after.png](evidence/T4_after.png) | The same two saved records and count 2 after reopening |
+| [T6_invalid.png](evidence/T6_invalid.png) | A space-only name rejected while River ID 2 and count 1 stayed unchanged |
+
+## Reflection answers
 
 ### 1. The disappearing-data mystery
 
-The assistant prediction was recorded before T4 in `evidence/T4_prediction.txt`: IDs 1 and 2 (River ages 21 and 35), count 2, would survive because the writes completed to the same SQLite file; unsaved form state would not. On Android 17, App info > Force stop > OK followed by the launcher icon produced a new process (2682 to 8477) and restored exactly those values, as shown in `T4_before.png` and `T4_after.png`. The restore path is `main()` > awaited `helper.init()` > `DirectoryScreen.initState()` > `_refresh()` > `_loadRows()` > queried rows/count > `setState()` > list. Missing or changed rows after that same-installation restart, or evidence of automatic reinsertion instead of querying, would disprove the claimed restore.
+The recorded prediction was that the saved rows would survive because SQLite stores them in a file, while unsaved form input stays in memory. After Force stop and a launcher restart, IDs 1 and 2 still had ages 21 and 35, and the count was still 2; the before and after screenshots show this. The restore path is `main()` waiting for `init()`, followed by `initState()`, `_refresh()`, `_loadRows()`, the row/count queries, and `setState()` displaying the results. Missing or changed rows after the same-installation restart, or automatic reinsertion instead of a database read, would undermine this explanation.
 
 ### 2. Two Rivers, one wrong edit
 
-The two Rivers were IDs 1 and 2; T3 canceled an unsaved age 99 for ID 2, leaving it at 34, then saved age 35 with one affected row while ID 1 remained age 21 (count 2). `_edit()` stores `_id`, and `_save()` passes it to `update()`, which binds `_id = ?` using `whereArgs: [id]`; targeting by name could change both rows. Cancel clears form/selection without calling the helper's update method, explaining why the unsaved age did not reach SQLite.
+The two guests have the same name, so the ID is the reliable way to choose which one to change. The update uses `_id = ?` with `whereArgs: [id]`; using the name could change both rows. In the recorded test, canceling the age 99 edit kept ID 2 at 34, and saving age 35 updated one row while ID 1 stayed at 21. Cancel only clears the form and selection, so it does not write to the database.
 
-### 3. Your own usability walkthrough
+### 3. Usability walkthrough
 
-In the assistant walkthrough, a space-only name with age 21 showed "Enter a nonempty name" while River ID 2 remained age 35 and count 1 (`T6_invalid.png`); canceling deletion also explicitly said no changes. The previous "Roster refreshed from local storage" message remained visible below the invalid form, which could distract from the new validation result. A small proposed improvement is to clear old action feedback whenever validation rejects an Add/Save attempt; the improvement is not implemented. Review this observation and replace or supplement it with your own walkthrough.
+The recorded walkthrough showed clear field feedback when a space-only name was entered, and the unchanged count helped confirm that nothing was saved. However, the earlier "Roster refreshed from local storage" message remained below the invalid form. I would clear the old action message whenever validation rejects Add or Save, so the current result is easier to understand. This is a proposed improvement and has not been added.
 
-### 4. Defend the storage boundary (optional graduate notes)
+## Development notes
 
-The UI enforces trimmed names and integer ages 0–130 because `NOT NULL` alone does not prohibit whitespace-only names or negative ages. A future application with other writers should also enforce appropriate database `CHECK` constraints; for this lab, all writes pass through the validated screen. Changing only the version-1 `onCreate` SQL will not change an existing installation's table, so adding a required column would need a version increase and a migration/backfill; otherwise queries or inserts expecting that column could fail.
+- The downloadable instructor helper was not included in the supplied material. `database_helper.dart` recreates the described interface and schema. The form and its CRUD interaction code were added for this project with Codex assistance. The expanded wording of prompts 2-4 and the grading rubric were not supplied.
+- The initial ADB input driver appended digits during an edit. The app rejected the invalid age; the driver was corrected, and T3 was rerun with the exact inputs 99 and 35.
+- Android's launcher briefly stalled during T4. Restarting its process and temporarily disabling animations recovered it; no app data was cleared. Normal animation settings were restored afterward.
+- The Windows build encountered a Kotlin cache problem. Gradle memory/workers were limited, and Kotlin incremental compilation was disabled. The original counter-app widget test was removed as instructed in the guide.
 
-## References
+## Before submitting
 
-- Supplied activity guide (pasted by the student).
-- [Flutter: Persist data with SQLite](https://docs.flutter.dev/cookbook/persistence/sqlite).
-- [sqflite package documentation](https://pub.dev/packages/sqflite).
+The final source archive is `Reddy_Rohan_InClass08.zip` and contains one `local_storage_lab` folder. Upload this ZIP to the course's In-Class 08 / Local Storage Part 1 entry, then reopen or download it and check the submission receipt. The posted cutoff is October 6, 2026 at 8:00 pm in the course/iCollege timezone. The guide asks for a personal prediction and walkthrough, so complete your own T1-T6 run and update the evidence and reflections as required. Keep the assistance disclosure consistent with your course rules.
 
-## Before submission
+## Attribution and references
 
-1. Add your identity and pathway; confirm the full LMS rubric, expanded prompts, archive name, and upload requirements.
-2. Review the implementation and compare the recreated helper with the instructor's downloadable helper.
-3. Perform your own T1–T6 walkthrough with fictional data, a prediction before T4, and the specified actual stop/relaunch method. Use your own IDs/counts and screenshots if the course requires personally collected evidence.
-4. Personalize the required reflections and retain the AI-assistance disclosure according to course policy.
-5. Inspect the source ZIP and upload it to the LMS. The pasted guide lists October 6, 2026 at 8:00 pm as the deadline; it does not supply a timezone.
+- Starter basis: the supplied Local Storage Lab activity guide, including the described database helper interface/schema and dependency constraints. The actual starter helper file was not supplied.
+- Assistance: Codex helped write the implementation and documentation and performed the recorded emulator checks. Those observations are not presented as a student-performed test run.
+- [Flutter SQLite cookbook](https://docs.flutter.dev/cookbook/persistence/sqlite).
+- [sqflite documentation](https://pub.dev/packages/sqflite).
