@@ -1,0 +1,149 @@
+[
+  {
+    "attempt": "spaces",
+    "input": {
+      "name": "   ",
+      "age": "21"
+    },
+    "observed": [
+      "Fall Festival Roster",
+      "Register a guest",
+      "Enter a nonempty name.",
+      "Add",
+      "Refresh",
+      "Roster refreshed from local storage.",
+      "Record count: 1",
+      "ID 2: River — age 35",
+      "Edit",
+      "Delete"
+    ],
+    "result": "PASS"
+  },
+  {
+    "attempt": "abc",
+    "input": {
+      "name": "Maple",
+      "age": "abc"
+    },
+    "observed": [
+      "Fall Festival Roster",
+      "Register a guest",
+      "Enter a whole-number age.",
+      "Add",
+      "Refresh",
+      "Roster refreshed from local storage.",
+      "Record count: 1",
+      "ID 2: River — age 35",
+      "Edit",
+      "Delete"
+    ],
+    "result": "PASS"
+  },
+  {
+    "attempt": "decimal",
+    "input": {
+      "name": "Maple",
+      "age": "1.5"
+    },
+    "observed": [
+      "Fall Festival Roster",
+      "Register a guest",
+      "Enter a whole-number age.",
+      "Add",
+      "Refresh",
+      "Roster refreshed from local storage.",
+      "Record count: 1",
+      "ID 2: River — age 35",
+      "Edit",
+      "Delete"
+    ],
+    "result": "PASS"
+  },
+  {
+    "attempt": "negative",
+    "input": {
+      "name": "Maple",
+      "age": "-1"
+    },
+    "observed": [
+      "Fall Festival Roster",
+      "Register a guest",
+      "Age must be from 0 through 130.",
+      "Add",
+      "Refresh",
+      "Roster refreshed from local storage.",
+      "Record count: 1",
+      "ID 2: River — age 35",
+      "Edit",
+      "Delete"
+    ],
+    "result": "PASS"
+  },
+  {
+    "attempt": "too_high",
+    "input": {
+      "name": "Maple",
+      "age": "131"
+    },
+    "observed": [
+      "Fall Festival Roster",
+      "Register a guest",
+      "Age must be from 0 through 130.",
+      "Add",
+      "Refresh",
+      "Roster refreshed from local storage.",
+      "Record count: 1",
+      "ID 2: River — age 35",
+      "Edit",
+      "Delete"
+    ],
+    "result": "PASS"
+  },
+  {
+    "attempt": "age_zero",
+    "input": {
+      "name": "Acorn",
+      "age": "0"
+    },
+    "observed": [
+      "Fall Festival Roster",
+      "Register a guest",
+      "Add",
+      "Refresh",
+      "Saved guest ID 3.",
+      "Record count: 2",
+      "ID 2: River — age 35",
+      "Edit",
+      "Delete",
+      "ID 3: Acorn — age 0",
+      "Edit",
+      "Delete"
+    ],
+    "result": "PASS"
+  },
+  {
+    "attempt": "age_130",
+    "input": {
+      "name": "Oak",
+      "age": "130"
+    },
+    "observed": [
+      "Fall Festival Roster",
+      "Register a guest",
+      "Add",
+      "Refresh",
+      "Saved guest ID 4.",
+      "Record count: 3",
+      "ID 2: River — age 35",
+      "Edit",
+      "Delete",
+      "ID 3: Acorn — age 0",
+      "Edit",
+      "Delete",
+      "ID 4: Oak — age 130",
+      "Edit",
+      "Delete"
+    ],
+    "result": "PASS"
+  }
+]

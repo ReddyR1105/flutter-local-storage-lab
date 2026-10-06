@@ -1,0 +1,5 @@
+Android 17, Pixel_4a, emulator-5554. Installed debug APK; no attached Flutter debug session.
+Before PID: 2682. App info > Force stop > OK. pidof returned no process after stopping. Home > All Apps (KEYCODE_ALL_APPS) > tapped local_storage_lab launcher icon.
+The launcher initially stalled; its animations were disabled and its process restarted without clearing app data, then the icon was tapped successfully.
+After PID: 8477. Same installation, no uninstall, no Clear storage, no reseeding.
+Restored: ID 1 River age 21; ID 2 River age 35; count 2.
