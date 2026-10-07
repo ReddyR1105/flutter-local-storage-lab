@@ -1,0 +1,11 @@
+Walkthrough
+Operator: Codex using Android emulator controls.
+Recorded at: 2026-10-07T00:09:34.188415+00:00
+Target: Pixel_4a, emulator-5554, Android 17.
+Action: Refresh, enter Maple / abc, then tap Add.
+Before: Record count: 3; ID 2: River — age 35; ID 3: Acorn — age 0; ID 4: Oak — age 130
+After: Record count: 3; ID 2: River — age 35; ID 3: Acorn — age 0; ID 4: Oak — age 130
+Validation feedback: Enter a whole-number age.
+Observation: No guest was added; all three saved rows and the count stayed unchanged. The earlier Roster refreshed from local storage message remained visible below the form.
+Proposed improvement: Clear the previous action message when form validation fails. This improvement was not implemented.
+Execution note: The first attempt encountered an Android not-responding dialog before Add. The app was force stopped and reopened without clearing data; this log records the subsequent completed attempt.

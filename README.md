@@ -109,15 +109,18 @@ The recorded prediction was that the saved rows would survive because SQLite sto
 
 The two guests have the same name, so the ID is the reliable way to choose which one to change. The update uses `_id = ?` with `whereArgs: [id]`; using the name could change both rows. In the recorded test, canceling the age 99 edit kept ID 2 at 34, and saving age 35 updated one row while ID 1 stayed at 21. Cancel only clears the form and selection, so it does not write to the database.
 
-### 3. Usability walkthrough
+### 3. Walkthrough
 
-The recorded walkthrough showed clear field feedback when a space-only name was entered, and the unchanged count helped confirm that nothing was saved. However, the earlier "Roster refreshed from local storage" message remained below the invalid form. I would clear the old action message whenever validation rejects Add or Save, so the current result is easier to understand. This is a proposed improvement and has not been added.
+The form showed "Enter a whole-number age" when Maple was entered with age abc. The count stayed at 3, and River (ID 2, age 35), Acorn (ID 3, age 0), and Oak (ID 4, age 130) stayed unchanged. The earlier "Roster refreshed from local storage" message was still visible below the form, which could make the latest result less clear. I would clear the old message when validation fails so the age error is easier to notice; this is a proposed improvement that has not been added.
+
+The observations are saved in [usability_walkthrough.txt](evidence/usability_walkthrough.txt).
 
 ## Development notes
 
 - The downloadable instructor helper was not included in the supplied material. `database_helper.dart` recreates the described interface and schema. The form and its CRUD interaction code were added for this project with Codex assistance. The expanded wording of prompts 2-4 and the grading rubric were not supplied.
 - The initial ADB input driver appended digits during an edit. The app rejected the invalid age; the driver was corrected, and T3 was rerun with the exact inputs 99 and 35.
 - Android's launcher briefly stalled during T4. Restarting its process and temporarily disabling animations recovered it; no app data was cleared. Normal animation settings were restored afterward.
+- The first attempt at the later walkthrough showed an Android "not responding" dialog before Add. Restarting the app without clearing its data allowed the check to finish; the cause was not isolated.
 - The Windows build encountered a Kotlin cache problem. Gradle memory/workers were limited, and Kotlin incremental compilation was disabled. The original counter-app widget test was removed as instructed in the guide.
 
 ## Package contents and check
