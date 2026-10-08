@@ -1,0 +1,11 @@
+{
+  "result": "Pass",
+  "operator": "Codex via emulator UI",
+  "package_id": "com.example.local_storage_lab.freshcheck",
+  "schema_matches_upgrade": true,
+  "initial_guest_count": 0,
+  "initial_folder_count": 0,
+  "initial_card_count": 0,
+  "created_folder_id": 1,
+  "created_card_id": 1
+}

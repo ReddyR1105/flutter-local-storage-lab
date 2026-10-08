@@ -1,7 +1,7 @@
 ﻿name: local_storage_lab
-description: Fall Festival guest roster with durable local SQLite storage.
+description: Card catalogue with folder relationships and a safe Part I database upgrade.
 publish_to: none
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: ^3.13.3

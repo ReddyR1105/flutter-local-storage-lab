@@ -1,139 +1,151 @@
-# In-Class 08 / Fall Festival Roster
+# In-Class Activity 09 / Card Catalogue
 
-- **Student:** Rohan Reddy
+- **Student:** Rohan Reddy Gosangi
 - **Course/section:** CSC MAD (Mobile Application Development)
 - **Pathway:** Undergraduate
-- **Date:** October 6, 2026
+- **Date:** October 8, 2026
 - **Repository:** https://github.com/ReddyR1105/flutter-local-storage-lab
 
-## Assistance
+## What the app does
 
-I used Codex to help prepare the Flutter app and this write-up. Codex ran the recorded emulator checks, so the screenshots and observations below come from those checks.
+This app extends the Part I guest roster with folders and cards. Each folder shows its card count. Opening it reads only cards with its integer folder ID. Folders and cards support Add, Edit, Cancel, and confirmed Delete. The people icon opens the original Part I roster; its table and records are still available.
 
-## About the app
+The implementation and write-up were prepared with Codex assistance. Codex operated the emulator and collected the observations below. These are actual recorded checks, rather than a claim that the student personally operated them. Only fictional test records appear in the evidence.
 
-The app keeps a small guest list for a Fall Festival. Each guest has a name, an age, and an ID assigned by SQLite. The screen supports Add, Edit, Cancel edit, Delete, and Refresh, and it displays the saved records and their count.
+## Environment and commands
 
-## Storage notes
+- Flutter 3.47.4; Dart 3.13.3; Windows development host.
+- Target: Pixel_4a Android emulator, Android 17 / API 37.1, x86_64, serial `emulator-5554`.
+- Declared packages: sqflite ^2.4.1, path_provider ^2.1.5, path ^1.9.0. Locked versions: sqflite 2.4.4+1, path_provider 2.1.6, path 1.9.1.
+- Android application ID: `com.example.local_storage_lab`; app version 2.0.0+2; minimum Android API 24, target API 36. Android release APK contains arm64-v8a, armeabi-v7a, and x86_64.
+- iOS configuration is retained from Part I, but iOS was not tested.
 
-- **Schema and initialization:** `MyDatabase.db` is stored in the app's documents directory. Version 1 creates `my_table`; `main()` initializes one helper and waits for `init()` before the first read. The columns are listed below.
-- **Input policy, IDs, and CRUD:** names are trimmed and must be nonempty; ages must be integers from 0 to 130. SQLite generates the IDs, and update/delete bind the selected ID. CRUD methods are in [database_helper.dart](lib/database_helper.dart); form validation, confirmation, and screen refresh are in [main.dart](lib/main.dart).
-
-| Column | Type | Purpose |
-| --- | --- | --- |
-| `_id` | `INTEGER PRIMARY KEY` | Identifies a guest, even when names match |
-| `name` | `TEXT NOT NULL` | Stores the guest's name |
-| `age` | `INTEGER NOT NULL` | Stores the guest's age |
-
-**Storage examples:** the unsaved text in the form, selected edit ID, and loading flag are memory state. A small theme choice could use key-value preferences; this app does not implement that optional setting. Guest records such as River, ID 2, age 35 belong in SQLite. The first read runs from `initState()`, and successful writes are followed by fresh row/count queries. No guests are seeded at startup.
-
-The form trims the name and rejects an empty result. Ages must be whole numbers from 0 to 130. Edits and deletions use the selected ID, and deletion asks for confirmation showing the ID and name. The app disables controls while an operation is pending and shows loading, empty, error, and affected-row feedback. Failed writes preserve the form input; a completed write followed by a failed refresh has a separate message.
-
-## Setup and running
-
-The recorded checks used Windows, Flutter 3.47.4, Dart 3.13.3, and the Pixel_4a Android emulator (`emulator-5554`, Android 17 / API 37.1). iOS files are included, but iOS was not tested.
-
-The guide's dependency constraints were kept:
-
-```yaml
-sqflite: ^2.4.1
-path_provider: ^2.1.5
-path: ^1.9.0
-```
-
-The resolved versions are sqflite 2.4.4+1, path_provider 2.1.6, and path 1.9.1. `pubspec.lock` is included. The generated Dart constraint, `^3.13.3`, matches the installed SDK.
-
-On the recorded Windows setup, open a terminal in `local_storage_lab`, start the existing emulator, and run:
+Open a terminal in `local_storage_lab` with Flutter and Android platform-tools on PATH:
 
 ```powershell
-flutter emulators --launch Pixel_4a
+flutter --version
 flutter pub get
+flutter emulators --launch Pixel_4a
 flutter devices
 flutter run -d emulator-5554
+flutter analyze 2>&1 | Tee-Object -FilePath .\evidence\analysis_output.txt
+flutter build apk --release
+adb -s emulator-5554 install -r build/app/outputs/flutter-apk/app-release.apk
+adb -s emulator-5554 shell am start -n com.example.local_storage_lab/.MainActivity
 ```
 
-To run the analyzer and save its output:
+The final release file is copied and renamed to `Activity09_Gosangi_Rohan.apk`. The normal release build uses the existing Part I package, so an in-place update can retain its app data. Local coursework builds use the generated debug signing key for installation; no signing key is committed.
+
+### Reproduce the version-1 upgrade
+
+The original version-1 source is retained at commit `8d2db56`. On a disposable emulator, build/run that commit, add fictional guests, quit the attached Flutter run with `q`, then check out `main` and build/install version 2 over the same package. Keep the same development signing key. Do not uninstall the original package, clear storage, or change the database filename.
 
 ```powershell
-flutter analyze 2>&1 | Tee-Object -FilePath .\evidence\analysis_output.txt
+git checkout 8d2db56
+flutter pub get
+flutter run -d emulator-5554
+# Add fictional guest rows, then quit the attached run with q.
+git checkout main
+flutter pub get
+flutter build apk --debug --target-platform android-x64
+adb -s emulator-5554 install -r build/app/outputs/flutter-apk/app-debug.apk
+adb -s emulator-5554 shell am start -n com.example.local_storage_lab/.MainActivity
 ```
 
-## Test results
+### Reproduce the separate fresh-database check
 
-The analyzer reported **No issues found**, and the Android debug APK built successfully. The saved outputs are [analysis_output.txt](evidence/analysis_output.txt) and [build_output.txt](evidence/build_output.txt). The table below records the checks performed through the app on the emulator.
+An optional environment switch changes only the test package ID to `com.example.local_storage_lab.freshcheck`. It leaves the original package and its data alone. The fresh-check activity keeps the normal namespace:
 
-**A = ID 1** and **B = ID 2**. Both guests were named River.
+```powershell
+$env:ACTIVITY09_FRESH_INSTALL = '1'
+flutter build apk --debug --target-platform android-x64
+adb -s emulator-5554 install -r build/app/outputs/flutter-apk/app-debug.apk
+adb -s emulator-5554 shell am start -n com.example.local_storage_lab.freshcheck/com.example.local_storage_lab.MainActivity
+Remove-Item Env:ACTIVITY09_FRESH_INSTALL
+```
 
-| Test | Action/input | Expected | Observed rows/count | Pass/fail |
-| --- | --- | --- | --- | --- |
-| T1 - Empty | Refresh the empty roster | Count 0 and an empty-state message | Count 0; "No festival guests yet" | Pass |
-| T2 - Create | Add River, 21 and River, 34 | Different generated IDs; count 2 | ID 1: River, 21; ID 2: River, 34; count 2 | Pass |
-| T3 - Identity | Change B's age to 99 and Cancel; then change it to 35 and Save | Cancel keeps 34; Save updates one row and leaves A unchanged | Cancel kept ID 2 at 34. Save reported 1 updated row. ID 1 stayed 21; ID 2 became 35; count 2 | Pass |
-| T4 - Restart | Force stop the app and reopen the same installation from its launcher icon | Same IDs, names, ages, and count | ID 1: River, 21; ID 2: River, 35; count 2 before and after | Pass |
-| T5 - Delete | Cancel deletion of A; then confirm it and Refresh | Cancel keeps both rows; confirm deletes one row | Cancel kept count 2. Confirm reported 1 deleted row. Only ID 2: River, 35 remained; count 1 | Pass |
-| T6 - Validation | Try the five invalid inputs and two boundary ages listed below | Invalid inputs write nothing; ages 0 and 130 are accepted | All invalid attempts kept count 1. Acorn and Oak were accepted; final count 3 | Pass |
+## Database and architecture
 
-### T6: individual attempts
+- **Preservation:** the same `MyDatabase.db` in the app documents directory moves from version 1 to 2. `onUpgrade` adds the new tables and index when `oldVersion < 2`; it never changes or recreates `my_table`. `onCreate` builds the original table plus the same new schema for a fresh installation.
+- **Relationship:** `folders(id, name, created_at)` is the parent of `cards(id, title, suit, notes, image_ref, folder_id)`. A card has a required foreign key to a folder with `ON DELETE CASCADE`. `idx_cards_folder_id` indexes the child lookup. `onConfigure` enables foreign keys for each connection. sqflite already wraps create/upgrade callbacks in a transaction, so the callbacks do not start a nested transaction ([sqflite documentation](https://pub.dev/packages/sqflite)).
+- **Policy:** folder names are trimmed, nonempty, and unique with SQLite's default case-sensitive uniqueness. Card titles are trimmed/nonempty; supported suits are spades, hearts, diamonds, and clubs. Notes are optional, and a blank image reference becomes SQL NULL. SQL CHECK constraints also protect nonempty names/titles and supported suits. IDs come from insert results, never folder names or list positions. A deleted/missing parent is rejected by the foreign key.
+- **Initialization:** there is no automatic seeding. Test folders/cards were added through the form, so reopening or rebuilding a screen cannot add duplicates.
 
-| Input | Expected | Observed rows/count | Pass/fail |
-| --- | --- | --- | --- |
-| Three spaces as the name; age 21 | Reject the empty trimmed name | "Enter a nonempty name"; River ID 2, age 35 unchanged; count 1 | Pass |
-| Maple; age abc | Reject a nonnumber | "Enter a whole-number age"; River ID 2 unchanged; count 1 | Pass |
-| Maple; age 1.5 | Reject a decimal | "Enter a whole-number age"; River ID 2 unchanged; count 1 | Pass |
-| Maple; age -1 | Reject an age below 0 | "Age must be from 0 through 130"; River ID 2 unchanged; count 1 | Pass |
-| Maple; age 131 | Reject an age above 130 | "Age must be from 0 through 130"; River ID 2 unchanged; count 1 | Pass |
-| Acorn; age 0 | Accept the minimum age | Acorn received ID 3; River ID 2 unchanged; count 2 | Pass |
-| Oak; age 130 | Accept the maximum age | Oak received ID 4; River ID 2 and Acorn ID 3 unchanged; count 3 | Pass |
-
-The final saved rows were River (ID 2, age 35), Acorn (ID 3, age 0), and Oak (ID 4, age 130). The source archive does not contain the emulator's database; a new installation starts empty. The individual T6 observations are also saved in [T6_results.json](evidence/T6_results.json).
-
-### Restart method and screenshots
-
-The prediction was recorded before T4 in [T4_prediction.txt](evidence/T4_prediction.txt). It predicted that IDs 1 and 2, ages 21 and 35, and count 2 would survive because they had been saved to SQLite.
-
-The installed debug APK had no attached Flutter debug session. Android App info was opened, Force stop was selected, and the confirmation was accepted. The app had no running process after that. It was reopened by tapping `local_storage_lab` in the launcher, without clearing storage or uninstalling it. The process ID changed from 2682 to 8477. The exact method is saved in [T4_restart_method.txt](evidence/T4_restart_method.txt).
-
-| Screenshot | What it shows |
+| File | Responsibility |
 | --- | --- |
-| [T4_before.png](evidence/T4_before.png) | ID 1: River, 21 and ID 2: River, 35; count 2 before stopping |
-| [T4_after.png](evidence/T4_after.png) | The same two saved records and count 2 after reopening |
-| [T6_invalid.png](evidence/T6_invalid.png) | A space-only name rejected while River ID 2 and count 1 stayed unchanged |
+| [database_helper.dart](lib/database_helper.dart) | Same database location, schema version, create/upgrade hooks, connection configuration, and original roster CRUD |
+| [models.dart](lib/models.dart) | Immutable Folder and CatalogueCard models with fromMap/toMap conversions |
+| [card_repository.dart](lib/card_repository.dart) | Folder counts, filtered card reads, insert/update/delete, bound ID parameters; no SQL in screens |
+| [catalogue_screens.dart](lib/catalogue_screens.dart) | Folder/card screens, shared add/edit forms, validation, confirmation, image fallback, and async feedback |
+| [legacy_roster.dart](lib/legacy_roster.dart) | Original Part I roster screen retained |
+| [main.dart](lib/main.dart) | Await database initialization and start the app; opening failure is visible and does not erase data |
 
-## Reflection answers
+A busy flag blocks repeated submissions during writes. Controllers are disposed, and mounted checks guard UI updates after awaits. A successful write followed by a failed read says that the write completed and asks for a Refresh retry; it does not repeat the write. Failed writes keep the form input. A zero-row update/delete is reported as missing data instead of a successful change. Lists distinguish loading, empty, and failed/stale reads.
 
-### 1. The disappearing-data mystery
+## Image-reference choice
 
-The recorded prediction was that the saved rows would survive because SQLite stores them in a file, while unsaved form input stays in memory. After Force stop and a launcher restart, IDs 1 and 2 still had ages 21 and 35, and the count was still 2; the before and after screenshots show this. The restore path is `main()` waiting for `init()`, followed by `initState()`, `_refresh()`, `_loadRows()`, the row/count queries, and `setState()` displaying the results. Missing or changed rows after the same-installation restart, or automatic reinsertion instead of a database read, would undermine this explanation.
+The default is a nullable reference and a suit-symbol placeholder. The app also recognizes `asset:` references and valid HTTPS URLs. Missing assets, malformed/unsupported references, and network errors use the same stable placeholder; HTTPS loading also shows it. Card title, suit, notes, IDs, and controls remain useful when an image fails. There is no gallery picker, image BLOB, or app-private-file image loader.
 
-### 2. Two Rivers, one wrong edit
+No image assets or third-party pictures are bundled. The missing paths in the tests are intentional failure cases. If adding a real asset, include the file and declare it in `pubspec.yaml`. The URI/file lifecycle alternatives are discussed in the reflection DOCX as design reasoning; unrun cases are labeled accordingly.
 
-The two guests have the same name, so the ID is the reliable way to choose which one to change. The update uses `_id = ?` with `whereArgs: [id]`; using the name could change both rows. In the recorded test, canceling the age 99 edit kept ID 2 at 34, and saving age 35 updated one row while ID 1 stayed at 21. Cancel only clears the form and selection, so it does not write to the database.
+## Actual tests
 
-### 3. Walkthrough
+Predictions were recorded before the upgrade in [predictions.txt](evidence/predictions.txt). SQLite snapshots in this folder are JSON/text observations; binary database backups remain outside the repository.
 
-The form showed "Enter a whole-number age" when Maple was entered with age abc. The count stayed at 3, and River (ID 2, age 35), Acorn (ID 3, age 0), and Oak (ID 4, age 130) stayed unchanged. The earlier "Roster refreshed from local storage" message was still visible below the form, which could make the latest result less clear. I would clear the old message when validation fails so the age error is easier to notice; this is a proposed improvement that has not been added.
+| Test | Action / expected | Actual IDs, values and counts | Result / evidence |
+| --- | --- | --- | --- |
+| T1 Upgrade preservation | Install version 2 over the existing version-1 package; keep every guest | Version 1 → 2; River ID 2 age 35, Acorn ID 3 age 0, Oak ID 4 age 130; guest count 3 before/after. New folders/cards/index exist, catalogue starts empty | Pass; T1_before.png, T1_after.png, T1_baseline.json, T1_upgrade.json |
+| T2 Parent-child create | Create Practice and Keep; put two cards in Practice and one in Keep | Practice ID 1: Ace ID 1 and King ID 2, count 2. Keep ID 2: Queen ID 3, count 1. Each view is filtered by its returned folder ID | Pass; T2_cards.png, T2_after.json, T2_result.json |
+| T3 Edit identity | Save one card's title/notes, then cancel an edit of another card | Card ID 1 became Ace revised / Edited only this card; feedback: Updated 1 row. King ID 2 and Queen ID 3 unchanged. King unsaved was canceled; counts remain 2 and 1 | Pass; T3_saved.json, T3_cancel.json, T3_result.json |
+| T4 Restart persistence | Force stop without clearing data, then reopen the installed app | Same folder IDs 1/2 and counts 2/1; same card IDs 1/2/3, titles, notes, suits, references, timestamps and folder links; same 3 guests. PID 4822 → 6817 | Pass; T4_after.png, T4_before_restart.json, T4_after_restart.json, T4_result.json |
+| T5 Delete behavior | Cancel Practice deletion, then confirm the disposable folder's cascade | Cancel: identical records. Confirm: folder ID 1 and child card IDs 1/2 removed. Keep ID 2 and Queen ID 3 remain, count 1; all Part I guests unchanged; no foreign-key violations | Pass; T5_cancel.json, T5_after.json, T5_result.json |
+| T6 Validation and image fallback | Display null, missing-asset, malformed references; reject empty/space-only title | Queen ID 3 remains in folder ID 2, count 1, with suit fallback in each image case. Empty title and three spaces both show Enter a card title; saved rows identical before/after | Pass; T6_fallback.png, T6_invalid.png, T6_result.json |
 
-The observations are saved in [usability_walkthrough.txt](evidence/usability_walkthrough.txt).
+T4 stop/relaunch commands, with no attached Flutter debug session:
 
-## Development notes
+```powershell
+adb -s emulator-5554 shell am force-stop com.example.local_storage_lab
+adb -s emulator-5554 shell am start -n com.example.local_storage_lab/.MainActivity
+```
 
-- The downloadable instructor helper was not included in the supplied material. `database_helper.dart` recreates the described interface and schema. The form and its CRUD interaction code were added for this project with Codex assistance. The expanded wording of prompts 2-4 and the grading rubric were not supplied.
-- The initial ADB input driver appended digits during an edit. The app rejected the invalid age; the driver was corrected, and T3 was rerun with the exact inputs 99 and 35.
-- Android's launcher briefly stalled during T4. Restarting its process and temporarily disabling animations recovered it; no app data was cleared. Normal animation settings were restored afterward.
-- The first attempt at the later walkthrough showed an Android "not responding" dialog before Add. Restarting the app without clearing its data allowed the check to finish; the cause was not isolated.
-- The Windows build encountered a Kotlin cache problem. Gradle memory/workers were limited, and Kotlin incremental compilation was disabled. The original counter-app widget test was removed as instructed in the guide.
+No process remained after force stop; the reopened process had a different PID. Storage was not cleared, the package was not uninstalled, and the database was not renamed.
 
-## Package contents and check
+### Additional checks
 
-`Reddy_Rohan_InClass08.zip` contains one `local_storage_lab` project folder with the app source, Android/iOS configuration, package files, README, and evidence. The three required screenshots and the saved analyzer output are included. Codex extracted the archive into a separate folder and checked the source and configuration; the Dart code matches the tested app, with only Git line-ending normalization. Generated build folders, dependency caches, signing keys, machine-specific configuration, and database files are excluded. A second build from the extracted copy was not run, as the guide does not require it.
+- Folder ID 2 was renamed from Keep to Keepers with one updated row and the same ID. Temporary card ID 4 was created under disposable Scratch folder ID 3, moved to Keepers through the folder selector, then deleted by ID. Canceling that card's deletion made no changes. Scratch's empty state and confirmed deletion were checked. Final main-install state: Keepers ID 2, Queen ID 3, card count 1, original guest count 3 ([additional_CRUD_result.json](evidence/additional_CRUD_result.json)).
+- Fresh package: version 2 created from scratch; schema exactly matched the upgraded schema; initial guests/folders/cards were 0/0/0. Fresh sample folder ID 1 and Fresh card ID 1 were then created and linked successfully. The original app's data was untouched ([fresh_result.json](evidence/fresh_result.json), [fresh_install.png](evidence/fresh_install.png)).
+- Analyzer: `flutter analyze` reported **No issues found** ([analysis_output.txt](evidence/analysis_output.txt)).
+- The exact named release APK was signature-verified, installed over the upgraded main app, opened, checked for the retained folder/card and original guests, tested for blank-title rejection and fallback, and force-stopped/reopened successfully ([release_smoke_result.json](evidence/release_smoke_result.json), [release_smoke.png](evidence/release_smoke.png)).
 
-## Before submitting
+Release APK: `Activity09_Gosangi_Rohan.apk`; 51,066,448 bytes. SHA-256: `c3930022a22a3dd7262dc0352be6180cdada8ee0b4d705e30ff18c2eb741d92b`. Its source build log is [release_build_output.txt](evidence/release_build_output.txt). Local path prefixes were redacted and trailing whitespace normalized; warnings and the build result are retained.
 
-The final source archive is `Reddy_Rohan_InClass08.zip` and contains one `local_storage_lab` folder. Upload this ZIP to the course's In-Class 08 / Local Storage Part 1 entry, then reopen or download it and check the submission receipt. The posted cutoff is October 6, 2026 at 8:00 pm in the course/iCollege timezone. The guide asks for a personal prediction and walkthrough, so complete your own T1-T6 run and update the evidence and reflections as required. Keep the assistance disclosure consistent with your course rules.
+## Rubric map
 
-## Attribution and references
+| Criterion | Source / evidence |
+| --- | --- |
+| Schema and preservation (25) | database_helper.dart; T1; fresh_result.json; T5 cascade |
+| Models, repository and CRUD (25) | models.dart; card_repository.dart; catalogue_screens.dart; T2/T3/T5/T6; additional CRUD |
+| Image handling and usability (10) | CardImage and form/screen states; T2/T6 screenshots; empty-state and delete checks |
+| Testing and evidence (20) | T1–T6 table and JSON results; three required named screenshots; analyzer; installed release smoke test |
+| Critical thinking and AI Lab (15) | Individual DOCX submitted separately; reflection prompts 1–3; exactly two official U questions required |
+| README and delivery (5) | This README, dependency/platform files; github_link.txt, release APK and DOCX submitted separately; iCollege receipt checked by the student |
 
-- Starter basis: the supplied Local Storage Lab activity guide, including the described database helper interface/schema and dependency constraints. The actual starter helper file was not supplied.
-- Assistance: Codex helped write the implementation and documentation and performed the recorded emulator checks. Those observations are not presented as a student-performed test run.
-- [Flutter SQLite cookbook](https://docs.flutter.dev/cookbook/persistence/sqlite).
-- [sqflite documentation](https://pub.dev/packages/sqflite).
+## Limitations and submission
+
+Only the documented Android emulator was tested; no physical Android device or iOS test was run. A successful HTTPS download/network-outage scenario and app-private-file loading were not tested. Missing-asset and malformed-reference fallbacks were observed without relying on a network. Zero-row write and read-after-write failure messages exist, but those failure branches were not deliberately injected. Folder names differing only in case are allowed by the chosen UNIQUE policy.
+
+An initial emulator session had a stuck display and unavailable UI hierarchy; it was restarted without wiping storage, then awakened/unlocked. Readable screenshots were verified after recovery. No Part I records were erased during recovery or migration. The Android build emitted native-access/SDK-tool warnings; the APK built, signature verification passed, and the exact release file was installed and tested.
+
+The official U1–U4 claim text was absent from the supplied companion notes. The individual reflection draft remains incomplete until exactly two official undergraduate questions are supplied and addressed. Student identity details belong in the separate DOCX; the student ID is not in this public repository.
+
+Submit three separate files to the correct Activity 09 iCollege folder: `github_link.txt`, `Activity09_Gosangi_Rohan.apk`, and the completed `Gosangi_Rohan_CriticalThinking.docx`. A source ZIP is not a substitute. Reopen/download the three uploads and retain the receipt; those iCollege actions are not claimed as completed here. The supplied notes list October 8, 2026 at 11:59 pm; the official assignment controls the cutoff/timezone and AI-use rules.
+
+## Attribution and resources
+
+Part I's helper/interface and roster were recreated from the supplied Activity 08 guide with Codex assistance; the instructor's downloadable helper was not supplied. Activity 09's migration, models, repository, catalogue UI, image handling, tests and documentation were added with Codex assistance. The original write-up/evidence are retained under [docs/activity08](docs/activity08/README.md), and original source is in Git history at `8d2db56`.
+
+- Supplied Activity 09 Local Storage Part II companion notes: requirements and rubric summary; official instructions remain the source of truth.
+- [sqflite package documentation](https://pub.dev/packages/sqflite): bound queries, schema callbacks and transaction behavior.
+- [SQLite foreign keys](https://www.sqlite.org/foreignkeys.html): connection enforcement and delete actions.
+- [Flutter Android release guide](https://docs.flutter.dev/deployment/android): release build and installation.
+- Flutter Material widgets and suit characters are used; no external image assets/licenses are required.

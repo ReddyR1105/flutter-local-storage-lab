@@ -46,3 +46,15 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Coursework evidence uses fictional rows in text/JSON, never a database copy.
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.apk
+*.jks
+*.keystore
+*_CriticalThinking*.docx

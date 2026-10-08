@@ -1,0 +1,35 @@
+{
+  "test": "T3",
+  "operator": "Codex via emulator UI",
+  "result": "Pass",
+  "updated_card_id": 1,
+  "untouched_card_id": 2,
+  "affected_rows_feedback": "Updated 1 row.",
+  "canceled_title": "King unsaved",
+  "after": [
+    {
+      "id": 1,
+      "title": "Ace revised",
+      "suit": "spades",
+      "notes": "Edited only this card",
+      "image_ref": null,
+      "folder_id": 1
+    },
+    {
+      "id": 2,
+      "title": "King",
+      "suit": "spades",
+      "notes": "Second sample card",
+      "image_ref": "asset:assets/missing.png",
+      "folder_id": 1
+    },
+    {
+      "id": 3,
+      "title": "Queen",
+      "suit": "spades",
+      "notes": "Keep this card",
+      "image_ref": null,
+      "folder_id": 2
+    }
+  ]
+}

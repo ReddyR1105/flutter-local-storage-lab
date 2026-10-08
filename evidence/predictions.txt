@@ -1,0 +1,9 @@
+Activity 09 predictions recorded before the upgrade tests
+Operator: Codex
+UTC timestamp: 2026-10-08T22:04:31.713005+00:00
+
+Migration: MyDatabase.db will move from version 1 to 2, adding folders/cards/index while preserving guest IDs 2, 3, 4 with River age 35, Acorn age 0, Oak age 130.
+Relationship: Two cards inserted under Practice and one under Keep should stay separated by returned folder IDs, with counts 2 and 1.
+Delete: Cancel should leave all rows unchanged; confirming deletion of the disposable Practice folder should remove its two cards and preserve Keep and its card.
+Images: A null, missing-asset, or malformed image reference should show a suit fallback and should not delete the card.
+These are implementation/test predictions, not supplied U1-U4 question text.

@@ -10,12 +10,16 @@ class DatabaseHelper {
   static const columnName = 'name';
   static const columnAge = 'age';
   late Database _db;
+  Database get database => _db;
 
   Future<void> init() async {
     final directory = await getApplicationDocumentsDirectory();
     _db = await openDatabase(
       path.join(directory.path, 'MyDatabase.db'),
-      version: 1,
+      version: 2,
+      onConfigure: (db) async {
+        await db.execute('PRAGMA foreign_keys = ON');
+      },
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE $table (
@@ -24,8 +28,36 @@ class DatabaseHelper {
             $columnAge INTEGER NOT NULL
           )
         ''');
+        await _createCatalogueSchema(db);
+      },
+      // These callbacks are already inside sqflite's transaction.
+      // Leave the Part I table and rows untouched and keep the same filename.
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) await _createCatalogueSchema(db);
       },
     );
+  }
+
+  static Future<void> _createCatalogueSchema(DatabaseExecutor db) async {
+    await db.execute('''
+      CREATE TABLE folders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE CHECK(length(trim(name)) > 0),
+        created_at TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE cards (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL CHECK(length(trim(title)) > 0),
+        suit TEXT NOT NULL CHECK(suit IN ('spades', 'hearts', 'diamonds', 'clubs')),
+        notes TEXT NOT NULL DEFAULT '',
+        image_ref TEXT,
+        folder_id INTEGER NOT NULL,
+        FOREIGN KEY (folder_id) REFERENCES folders(id) ON DELETE CASCADE
+      )
+    ''');
+    await db.execute('CREATE INDEX idx_cards_folder_id ON cards(folder_id)');
   }
 
   Future<int> insert(Map<String, dynamic> row) => _db.insert(table, row);

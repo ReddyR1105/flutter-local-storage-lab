@@ -1,0 +1,26 @@
+{
+  "test": "T1",
+  "operator": "Codex via emulator UI",
+  "result": "Pass",
+  "version_before": 1,
+  "version_after": 2,
+  "guest_count_before": 3,
+  "guest_count_after": 3,
+  "guests": [
+    {
+      "_id": 2,
+      "name": "River",
+      "age": 35
+    },
+    {
+      "_id": 3,
+      "name": "Acorn",
+      "age": 0
+    },
+    {
+      "_id": 4,
+      "name": "Oak",
+      "age": 130
+    }
+  ]
+}

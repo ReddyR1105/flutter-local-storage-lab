@@ -16,7 +16,10 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.local_storage_lab"
+        // A separate package is used only for the disposable fresh-install check.
+        // The normal build keeps Part I's package and its existing app data.
+        applicationId = if (System.getenv("ACTIVITY09_FRESH_INSTALL") == "1")
+            "com.example.local_storage_lab.freshcheck" else "com.example.local_storage_lab"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

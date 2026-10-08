@@ -1,0 +1,49 @@
+{
+  "test": "T6",
+  "operator": "Codex via emulator UI",
+  "result": "Pass",
+  "observations": [
+    {
+      "case": "null image",
+      "card_id": 3,
+      "card_count": 1,
+      "fallback_visible": true
+    },
+    {
+      "case": "missing_asset",
+      "card_id": 3,
+      "card_count": 1,
+      "image_ref": "asset:assets/unavailable.png",
+      "fallback_visible": true
+    },
+    {
+      "case": "malformed",
+      "card_id": 3,
+      "card_count": 1,
+      "image_ref": "not-a-valid-image-reference",
+      "fallback_visible": true
+    },
+    {
+      "case": "blank",
+      "input": "",
+      "message": "Enter a card title.",
+      "unchanged_card_count": 1
+    },
+    {
+      "case": "spaces",
+      "input": "   ",
+      "message": "Enter a card title.",
+      "unchanged_card_count": 1
+    }
+  ],
+  "remaining_cards": [
+    {
+      "id": 3,
+      "title": "Queen",
+      "suit": "spades",
+      "notes": "Keep this card",
+      "image_ref": "not-a-valid-image-reference",
+      "folder_id": 2
+    }
+  ]
+}

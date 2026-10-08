@@ -1,0 +1,19 @@
+{
+  "result": "Pass",
+  "operator": "Codex via emulator UI",
+  "apk_filename": "Activity09_Gosangi_Rohan.apk",
+  "apk_size_bytes": 51066448,
+  "sha256": "c3930022a22a3dd7262dc0352be6180cdada8ee0b4d705e30ff18c2eb741d92b",
+  "package_id": "com.example.local_storage_lab",
+  "version_name": "2.0.0",
+  "release_installed_over_tested_upgrade": true,
+  "checks": [
+    "Folder Keepers ID 2 and card count 1",
+    "Queen card ID 3 belongs to folder ID 2",
+    "Malformed image reference shows suit fallback",
+    "Blank title rejected; cancel leaves card count 1",
+    "Part I guests ID 2/3/4 with ages 35/0/130 remain",
+    "Release force-stop and relaunch retains folder count 1"
+  ],
+  "no_clear_or_uninstall": true
+}

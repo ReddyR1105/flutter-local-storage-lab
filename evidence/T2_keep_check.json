@@ -1,0 +1,72 @@
+{
+  "version": 2,
+  "guests": [
+    {
+      "_id": 2,
+      "name": "River",
+      "age": 35
+    },
+    {
+      "_id": 3,
+      "name": "Acorn",
+      "age": 0
+    },
+    {
+      "_id": 4,
+      "name": "Oak",
+      "age": 130
+    }
+  ],
+  "schema": [
+    {
+      "name": "cards",
+      "sql": "CREATE TABLE cards (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        title TEXT NOT NULL CHECK(length(trim(title)) > 0),\n        suit TEXT NOT NULL CHECK(suit IN ('spades', 'hearts', 'diamonds', 'clubs')),\n        notes TEXT NOT NULL DEFAULT '',\n        image_ref TEXT,\n        folder_id INTEGER NOT NULL,\n        FOREIGN KEY (folder_id) REFERENCES folders(id) ON DELETE CASCADE\n      )"
+    },
+    {
+      "name": "folders",
+      "sql": "CREATE TABLE folders (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        name TEXT NOT NULL UNIQUE CHECK(length(trim(name)) > 0),\n        created_at TEXT NOT NULL\n      )"
+    },
+    {
+      "name": "idx_cards_folder_id",
+      "sql": "CREATE INDEX idx_cards_folder_id ON cards(folder_id)"
+    },
+    {
+      "name": "my_table",
+      "sql": "CREATE TABLE my_table (\n            _id INTEGER PRIMARY KEY,\n            name TEXT NOT NULL,\n            age INTEGER NOT NULL\n          )"
+    }
+  ],
+  "integrity": "ok",
+  "foreign_key_violations": [],
+  "folders": [
+    {
+      "id": 1,
+      "name": "Practice",
+      "created_at": "2026-10-08T22:08:51.844786Z",
+      "card_count": 2
+    },
+    {
+      "id": 2,
+      "name": "Keep",
+      "created_at": "2026-10-08T22:09:10.310763Z",
+      "card_count": 0
+    }
+  ],
+  "cards": [
+    {
+      "id": 1,
+      "title": "Ace",
+      "suit": "spades",
+      "notes": "First sample card",
+      "image_ref": null,
+      "folder_id": 1
+    },
+    {
+      "id": 2,
+      "title": "King",
+      "suit": "spades",
+      "notes": "Second sample card",
+      "image_ref": "asset:assets/missing.png",
+      "folder_id": 1
+    }
+  ]
+}
