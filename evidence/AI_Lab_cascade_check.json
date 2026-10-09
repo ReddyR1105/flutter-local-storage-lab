@@ -1,0 +1,118 @@
+{
+  "operator": "Codex",
+  "scope": "Separate in-memory SQLite databases using the recorded app schema and fictional records; no installed app data is changed.",
+  "completed_utc": "2026-10-09T20:56:33.672399+00:00",
+  "sqlite_version": "3.50.4",
+  "prediction_file": "AI_Lab_cascade_prediction.json",
+  "cases": [
+    {
+      "foreign_keys": 1,
+      "practice_folder_id": 1,
+      "keep_folder_id": 2,
+      "inserted_card_ids": [
+        1,
+        2,
+        3
+      ],
+      "before_cards": [
+        {
+          "id": 1,
+          "title": "Ace",
+          "folder_id": 1
+        },
+        {
+          "id": 2,
+          "title": "King",
+          "folder_id": 1
+        },
+        {
+          "id": 3,
+          "title": "Queen",
+          "folder_id": 2
+        }
+      ],
+      "deleted_folder_rows": 1,
+      "after_cards": [
+        {
+          "id": 3,
+          "title": "Queen",
+          "folder_id": 2
+        }
+      ],
+      "orphan_cards": [],
+      "foreign_key_check": [],
+      "result": "Pass"
+    },
+    {
+      "foreign_keys": 0,
+      "practice_folder_id": 1,
+      "keep_folder_id": 2,
+      "inserted_card_ids": [
+        1,
+        2,
+        3
+      ],
+      "before_cards": [
+        {
+          "id": 1,
+          "title": "Ace",
+          "folder_id": 1
+        },
+        {
+          "id": 2,
+          "title": "King",
+          "folder_id": 1
+        },
+        {
+          "id": 3,
+          "title": "Queen",
+          "folder_id": 2
+        }
+      ],
+      "deleted_folder_rows": 1,
+      "after_cards": [
+        {
+          "id": 1,
+          "title": "Ace",
+          "folder_id": 1
+        },
+        {
+          "id": 2,
+          "title": "King",
+          "folder_id": 1
+        },
+        {
+          "id": 3,
+          "title": "Queen",
+          "folder_id": 2
+        }
+      ],
+      "orphan_cards": [
+        {
+          "id": 1,
+          "folder_id": 1
+        },
+        {
+          "id": 2,
+          "folder_id": 1
+        }
+      ],
+      "foreign_key_check": [
+        [
+          "cards",
+          1,
+          "folders",
+          0
+        ],
+        [
+          "cards",
+          2,
+          "folders",
+          0
+        ]
+      ],
+      "result": "Pass"
+    }
+  ],
+  "result": "Pass"
+}
